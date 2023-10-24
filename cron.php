@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Version: v1.5
+ * Version: v2.0
  * Developer: @DearAhmadi
  * Join us @DarkMindsTm 
  * Group: @DarkMindsGp
@@ -99,7 +99,7 @@ if ($all_bot['sendall'] == 1)
     }
 }
 /**
- * Version: v1.5
+ * Version: v2.0
  * Developer: @DearAhmadi
  * Join us @DarkMindsTm 
  * Group: @DarkMindsGp

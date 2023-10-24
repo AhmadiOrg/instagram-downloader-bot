@@ -904,17 +904,6 @@ exec("php ' . $file . ' > /dev/null &");');
                 $curl_handler = $this->curl_handler;
             }
 
-            if (isset($data['forgot'])) {
-                curl_setopt($curl_handler, CURLOPT_TIMEOUT_MS, $this->settings['forgot_time']);
-                unset($data['forgot']);
-            }
-            elseif ($action === 'getUpdates'){
-                curl_setopt($curl_handler, CURLOPT_TIMEOUT_MS, 5000);
-            }
-            else{
-                curl_setopt($curl_handler, CURLOPT_TIMEOUT_MS, 300);
-            }
-
             if (isset($data['return_array'])) {
                 $return_array = $data['return_array'];
                 unset($data['return_array']);

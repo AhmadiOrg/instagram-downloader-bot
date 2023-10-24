@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Version: v1.5
+ * Version: v2.0
  * Developer: @DearAhmadi
  * Join us @DarkMindsTm 
  * Group: @DarkMindsGp
@@ -82,7 +82,7 @@ class BPT_handler extends BPT
                     $name =         $res['full_name'] ?: 'ندارد';
                     $bio =          $res['biography'] ?: 'ندارد';
                     $type_page =    ($res['is_private'] == false) ? 'آزاد (پابلیک)' : 'قفل (پرایوت)';
-                    $keys =         [[["🗾 دانلود استوری های پیج", 'dlstory_' . $username]]];
+                    $keys =         [[["📕 دانلود هایلایت ها", 'dlhighlights_' . $username], ["🗾 دانلود استوری های پیج", 'dlstory_' . $username]]];
                     $txt =          "#️⃣ یوزرنیم پیج : <code>$username</code>\n📝 نام نمایشی پیج : <code>$name</code>\n\n🔐 وضعیت صفحه : <b>$type_page</b>\n\n🔸 تعداد پست ها : <code>{$res['media_count']}</code> عدد\n👈 تعداد فالور ها : <code>{$res['follower_count']}</code> عدد\n👈 تعداد فالووینگ ها : <code>{$res['following_count']}</code> عدد\n\n📍 بیوگرافی : \n<code>$bio</code>\n\n📥 @" . BOT_USERNAME;
                     if (!empty($pic))
                         $this->sendPhoto(['photo' => $pic, 'caption' => $txt, 'reply_markup'=>$this->eKey(['inline'=>$keys]), 'disable_web_page_preview'=>true, 'parse_mode'=>'HTML']);
@@ -107,7 +107,7 @@ class BPT_handler extends BPT
                     $result =           $handler->openLink('https://api.codesazan.ir/Instagram?' . http_build_query($params), 'GET', [], [], true);
                     if ($result['status'] == 200)
                     {
-                        $photo_formats =    ['jpg', 'png'];
+                        $photo_formats =    ['jpg', 'png', 'webp'];
                         foreach ($result['result']['medias'] as $media)
                         {
                             $type = (in_array($media['extension'], $photo_formats)) ? 'photo' : 'video';
@@ -288,7 +288,7 @@ class BPT_handler extends BPT
         {
             $username = str_replace('dlstory_','',$data);
             $this->answerCallbackQuery(['text'=>'🌐 در حال برقراری ارتباط ..', 'show_alert'=>false]);
-            $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[['🌐 در حال برقراری ارتباط ..', 'none']]]]), 'answer'=> null]);$this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[['🌐 در حال برقراری ارتباط ..', 'none']]]]), 'answer'=> null]);
+            $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[['🌐 در حال برقراری ارتباط ..', 'none']]]]), 'answer'=> null]);
             $params = array(
                 'key' =>        INSTA_KEY,
                 'type' =>       'pagestory',
@@ -307,13 +307,85 @@ class BPT_handler extends BPT
                     $group[0]['caption'] = "🤖 دانلود شده توسط : @" . BOT_USERNAME;
                     $this->sendMediaGroup(['chat_id' => $from_id, 'media' => json_encode($group), 'answer'=> null]);
                 }
-                $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[['✅ آپلود استوری ها به اتمام رسید', 'none']]]]), 'answer'=> null]);
+                $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[['✅ آپلود استوری ها به اتمام رسید', 'none']], [["📕 دانلود هایلایت ها", 'dlhighlights_' . $username]]]]), 'answer'=> null]);
             }
             else
             {
                 $this->answerCallbackQuery(['text'=>'⚠️ کاربر هیچ  استوری ندارد', 'show_alert'=>false]);
-                $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[['⚠️ کاربر هیچ  استوری ندارد', 'none']]]]), 'answer'=> null]);
+                $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[['⚠️ کاربر هیچ  استوری ندارد', 'none']], [["📕 دانلود هایلایت ها", 'dlhighlights_' . $username]]]]), 'answer'=> null]);
             }
+            return ;
+        }
+        if (strstr($data,'dlhighlights_')) 
+        {
+            $username = str_replace('dlhighlights_','',$data);
+            $this->answerCallbackQuery(['text'=>'🌐 در حال برقراری ارتباط ..', 'show_alert'=>false]);
+            $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[['🌐 در حال برقراری ارتباط ..', 'none']]]]), 'answer'=> null]);
+            $params = array(
+                'key' =>        INSTA_KEY,
+                'type' =>       'pagehightlight',
+                'username' =>    $username,
+            );
+            $result =           $handler->openLink('https://api.codesazan.ir/Instagram?' . http_build_query($params), 'GET', [], [], true);
+            if ($result['status'] == 200)
+            {
+                if (count($result['result']) > 0)
+                {
+                    $num =          0;
+                    foreach ($result['result'] as $res)
+                    {
+                        $num +=     1;
+                        $keys[] = ["{$res['Title']}", 'getHighlight@' . $username . '_' . $res['hightlightIDS']];
+                        if ($num == 25)
+                            break;
+                    }
+                    $keys = array_chunk($keys,2);
+                    $keys = array_merge([[['⬇️ یکی از هایلایت های پیج را انتخاب کنید ', 'none']]], $keys);
+                    array_push($keys, [["🗾 دانلود استوری های پیج", 'dlstory_' . $username]]);
+                    $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>$keys]), 'answer'=> null]);
+                }
+                else
+                    $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[["⚠️ هایلایتی پیدا نشد", 'none']], [["🗾 دانلود استوری های پیج", 'dlstory_' . $username]]]]), 'answer'=> null]);
+            }
+            else
+                $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[["⚠️ هایلایتی پیدا نشد", 'none']], [["🗾 دانلود استوری های پیج", 'dlstory_' . $username]]]]), 'answer'=> null]);
+            return ;
+        }
+        if (strstr($data,'getHighlight@')) 
+        {
+            $ex = explode('_', str_replace('getHighlight@','',$data));
+            $username = $ex[0];
+            $highlightID = $ex[1];
+            $this->answerCallbackQuery(['text'=>'🌐 در حال برقراری ارتباط ..', 'show_alert'=>false]);
+            $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[['🌐 در حال برقراری ارتباط ..', 'none']]]]), 'answer'=> null]);
+            $params = array(
+                'key' =>        INSTA_KEY,
+                'type' =>       'gethightlight',
+                'id' =>         $highlightID,
+            );
+            $result =           $handler->openLink('https://api.codesazan.ir/Instagram?' . http_build_query($params), 'GET', [], [], true);
+            if ($result['status'] == 200)
+            {
+                if (count($result['result']) > 0)
+                {
+                    $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[['📥 در حال آپلود هایلایت ها ..', 'none']]]]), 'answer'=> null]);
+                    foreach ($result['result'] as $media)
+                        $input_medias[] = ['type' => $media['type'], 'media' => $media['highlite']];
+
+                    $chunk = array_chunk($input_medias,10);
+                    foreach ($chunk as $group)
+                    {
+                        $group[0]['caption'] = "🤖 دانلود شده توسط : @" . BOT_USERNAME;
+                        $this->sendMediaGroup(['chat_id' => $from_id, 'media' => json_encode($group), 'answer'=> null]);
+                    }
+                    $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[["✅ دانلود هایلایت به اتمام ررسید.", 'none']],[["🗾 دانلود استوری های پیج", 'dlstory_' . $username]]]]), 'answer'=> null]);
+                }
+                else
+                    $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[["⚠️ خطا در دانلود هایلایت", 'none']],[["🗾 دانلود استوری های پیج", 'dlstory_' . $username]]]]), 'answer'=> null]);
+            }
+            else
+                $this->editMessageReplyMarkup(['chat_id'=>$from_id, 'message_id'=>$message_id, 'reply_markup'=>$this->eKey(['inline'=>[[["⚠️ خطا در دانلود هایلایت", 'none']],[["🗾 دانلود استوری های پیج", 'dlstory_' . $username]]]]), 'answer'=> null]);
+            return ;
         }
         if (in_array($from_id,$admins))
         {
@@ -378,7 +450,7 @@ class BPT_handler extends BPT
 }
 
 /**
- * Version: v1.5
+ * Version: v2.0
  * Developer: @DearAhmadi
  * Join us @DarkMindsTm 
  * Group: @DarkMindsGp

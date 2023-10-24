@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Version: v1.5
+ * Version: v2.0
  * Developer: @DearAhmadi
  * Join us @DarkMindsTm 
  * Group: @DarkMindsGp
